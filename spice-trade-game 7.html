@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大航海時代 スパイス貿易会社</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+JP:wght@300;400;700&display=swap');
+:root {
+  --gold:#C9973A; --gold2:#F0C060; --dark:#1A1208; --dark2:#2A1E0A;
+  --brown:#3D2B10; --cream:#F5EDD8; --sea:#1B4F72; --sea2:#2E86C1;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--dark);color:var(--cream);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
+h1,h2,h3{font-family:'Cinzel',serif;}
+/* SETUP */
+#setup{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.ttl h1{font-size:clamp(24px,5vw,46px);color:var(--gold2);text-align:center;letter-spacing:4px;}
+.ttl p{color:var(--gold);font-size:13px;letter-spacing:3px;text-align:center;margin-top:6px;}
+.sanim{font-size:54px;display:block;text-align:center;margin-bottom:10px;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.card{background:linear-gradient(135deg,var(--dark2),var(--brown));border:1px solid var(--gold);border-radius:12px;padding:26px;width:100%;max-width:470px;margin-top:24px;}
+.card h2{color:var(--gold2);font-size:17px;margin-bottom:18px;text-align:center;letter-spacing:2px;}
+.pr{display:flex;align-items:center;gap:9px;margin-bottom:11px;padding:9px 13px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(201,151,58,0.2);}
+.pn{font-family:'Cinzel',serif;font-size:15px;width:22px;flex-shrink:0;}
+.pi{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(201,151,58,0.3);border-radius:6px;padding:7px 9px;color:var(--cream);font-family:'Noto Sans JP',sans-serif;font-size:13px;}
+.pi:focus{outline:none;border-color:var(--gold);}
+.ps{background:rgba(0,0,0,0.5);border:1px solid rgba(201,151,58,0.3);border-radius:6px;padding:7px 7px;color:var(--cream);font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;}
+.tog{width:40px;height:21px;background:rgba(0,0,0,0.5);border-radius:11px;position:relative;cursor:pointer;border:1px solid rgba(201,151,58,0.3);transition:all 0.3s;flex-shrink:0;}
+.tog.on{background:var(--gold);border-color:var(--gold2);}
+.tog::after{content:'';position:absolute;width:15px;height:15px;background:white;border-radius:50%;top:2px;left:2px;transition:all 0.3s;}
+.tog.on::after{left:22px;}
+.sbtn{width:100%;margin-top:22px;padding:13px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark);border:none;border-radius:8px;font-family:'Cinzel',serif;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:2px;transition:all 0.2s;}
+.sbtn:hover{transform:translateY(-2px);}
+/* GAME */
+#game{display:none;padding:10px;max-width:1200px;margin:0 auto;}
+.gh{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;background:linear-gradient(90deg,var(--dark2),var(--brown),var(--dark2));border:1px solid var(--gold);border-radius:10px;margin-bottom:9px;}
+.gt{font-family:'Cinzel',serif;color:var(--gold2);font-size:16px;}
+.gp{background:var(--gold);color:var(--dark);padding:4px 13px;border-radius:18px;font-family:'Cinzel',serif;font-size:12px;font-weight:700;}
+.pb{display:flex;gap:4px;margin-bottom:9px;}
+.ps2{flex:1;padding:6px 3px;text-align:center;font-size:11px;border-radius:6px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);transition:all 0.3s;}
+.ps2.active{background:rgba(201,151,58,0.2);border-color:var(--gold);color:var(--gold2);font-weight:700;}
+.ps2.done{background:rgba(39,174,96,0.1);border-color:rgba(39,174,96,0.4);color:rgba(125,206,160,0.7);}
+/* PLAYER CARDS */
+.pg{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:9px;margin-bottom:9px;}
+.pc{background:linear-gradient(135deg,var(--dark2),var(--brown));border:2px solid rgba(201,151,58,0.3);border-radius:10px;padding:12px;position:relative;overflow:hidden;}
+.pc.active{border-color:var(--gold);box-shadow:0 0 16px rgba(201,151,58,0.3);}
+.pc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cc);}
+.pch{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.pcn{font-family:'Cinzel',serif;font-size:13px;}
+.pct{font-size:10px;padding:2px 6px;border-radius:9px;background:rgba(201,151,58,0.2);color:var(--gold);}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px;}
+.sb{background:rgba(0,0,0,0.3);border-radius:5px;padding:5px 7px;text-align:center;}
+.sl{font-size:10px;color:rgba(245,237,216,0.5);margin-bottom:2px;}
+.sv{font-size:14px;font-weight:700;}
+.sv.g{color:var(--gold2);}
+.sv.sm{font-size:12px;}
+.shr{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;}
+.sbg{background:rgba(27,79,114,0.4);border:1px solid var(--sea2);border-radius:5px;padding:3px 7px;font-size:11px;color:#7FC8E8;}
+.cr{display:flex;gap:3px;flex-wrap:wrap;}
+.ci{background:rgba(255,255,255,0.05);border:1px solid rgba(201,151,58,0.2);border-radius:3px;padding:2px 6px;font-size:11px;}
+.os{margin-top:5px;font-size:11px;color:rgba(245,237,216,0.6);border-top:1px solid rgba(255,255,255,0.07);padding-top:4px;}
+/* ACTION */
+.ap{background:linear-gradient(135deg,var(--dark2),var(--brown));border:1px solid var(--gold);border-radius:10px;padding:15px;margin-bottom:9px;}
+.ap h3{color:var(--gold2);font-size:14px;margin-bottom:11px;letter-spacing:1px;}
+.ab{display:flex;flex-wrap:wrap;gap:7px;}
+.btn{padding:9px 15px;border-radius:7px;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;transition:all 0.2s;display:flex;align-items:center;gap:5px;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn:not(:disabled):hover{transform:translateY(-2px);}
+.bg{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark);}
+.bs{background:linear-gradient(135deg,var(--sea),var(--sea2));color:white;}
+.br{background:linear-gradient(135deg,#8B1A1A,#C0392B);color:white;}
+.bgn{background:linear-gradient(135deg,#1A5C2A,#27AE60);color:white;}
+.bgy{background:rgba(255,255,255,0.1);color:var(--cream);border:1px solid rgba(255,255,255,0.2);}
+.bn{background:linear-gradient(135deg,#4A235A,#7D3C98);color:white;padding:10px 20px;font-size:14px;}
+/* MARKET */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px;}
+@media(max-width:660px){.mg{grid-template-columns:1fr;}}
+.mp{background:linear-gradient(135deg,var(--dark2),var(--brown));border:1px solid rgba(201,151,58,0.4);border-radius:10px;padding:13px;}
+.mp h3{font-size:12px;color:var(--gold2);margin-bottom:9px;letter-spacing:1px;}
+.mi{margin-bottom:9px;}
+.mih{display:flex;align-items:center;gap:5px;margin-bottom:3px;font-size:12px;font-weight:700;}
+.pl{font-size:10px;color:rgba(245,237,216,0.5);margin-bottom:2px;}
+.sl2{display:flex;flex-wrap:wrap;gap:2px;}
+.slot{width:25px;height:25px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1px solid;}
+.slotb{background:rgba(27,79,114,0.3);border-color:var(--sea2);color:#7FC8E8;}
+.slotsl{background:rgba(39,174,96,0.2);border-color:#27AE60;color:#7DCEA0;}
+.slott{background:rgba(0,0,0,0.5);border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.15);}
+/* INVESTORS */
+.ip{background:linear-gradient(135deg,var(--dark2),var(--brown));border:1px solid rgba(201,151,58,0.3);border-radius:10px;padding:12px;margin-bottom:9px;}
+.ip h3{font-size:12px;color:var(--gold2);margin-bottom:8px;}
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:6px;}
+.ic{background:rgba(0,0,0,0.3);border:1px solid rgba(201,151,58,0.2);border-radius:7px;padding:8px;font-size:12px;}
+.in2{color:var(--gold);font-weight:700;margin-bottom:3px;}
+.ih{color:rgba(245,237,216,0.55);font-size:11px;margin-top:3px;}
+/* LOG */
+.lp{background:rgba(0,0,0,0.4);border:1px solid rgba(201,151,58,0.2);border-radius:10px;padding:11px;margin-bottom:9px;max-height:135px;overflow-y:auto;}
+.lp h3{font-size:12px;color:var(--gold);margin-bottom:6px;}
+.le{font-size:11px;color:rgba(245,237,216,0.7);padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:7px;}
+.lt{color:var(--gold);opacity:0.6;flex-shrink:0;}
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:100;align-items:center;justify-content:center;padding:15px;}
+.ov.show{display:flex;}
+.mo{background:linear-gradient(135deg,var(--dark2),var(--brown));border:2px solid var(--gold);border-radius:14px;padding:22px;width:100%;max-width:450px;box-shadow:0 0 50px rgba(201,151,58,0.25);max-height:90vh;overflow-y:auto;}
+.mo h2{color:var(--gold2);font-size:17px;margin-bottom:16px;text-align:center;letter-spacing:2px;}
+.msec{margin-bottom:14px;}
+.msec h3{color:var(--gold);font-size:12px;margin-bottom:7px;letter-spacing:1px;}
+.or{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:rgba(0,0,0,0.3);border-radius:7px;margin-bottom:6px;border:1px solid rgba(201,151,58,0.2);}
+.oi{font-size:12px;}
+.oc{color:var(--gold);font-size:11px;margin-top:2px;}
+.mb{display:flex;gap:7px;margin-top:14px;}
+.mb .btn{flex:1;justify-content:center;}
+.srow2{display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:rgba(0,0,0,0.3);border-radius:5px;margin-bottom:4px;border:1px solid rgba(201,151,58,0.15);}
+.hint{width:100%;margin-bottom:7px;padding:7px 11px;background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.4);border-radius:7px;font-size:11px;color:#E98080;}
+.cbox{padding:9px 11px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.4);border-radius:7px;font-size:12px;margin-top:7px;}
+.pmr{display:flex;align-items:center;gap:6px;}
+.pmv{font-size:14px;font-weight:700;min-width:18px;text-align:center;}
+/* RESULTS */
+.rt{width:100%;border-collapse:collapse;margin:12px 0;}
+.rt th{background:rgba(201,151,58,0.2);color:var(--gold2);padding:7px 9px;text-align:left;font-size:11px;font-family:'Cinzel',serif;}
+.rt td{padding:7px 9px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.rt tr:nth-child(even) td{background:rgba(0,0,0,0.15);}
+.rt .r1 td{color:var(--gold2);}
+.wb{text-align:center;padding:15px;background:rgba(201,151,58,0.15);border:2px solid var(--gold);border-radius:10px;margin-bottom:15px;}
+.wb h2{color:var(--gold2);font-size:21px;margin-bottom:5px;}
+/* VOYAGE */
+.vr{display:flex;align-items:center;gap:8px;padding:8px 11px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid rgba(255,255,255,0.08);margin-bottom:6px;transition:all 0.3s;}
+.vr.vw{background:rgba(201,151,58,0.15);border-color:var(--gold);}
+.vrank{font-size:17px;width:26px;text-align:center;flex-shrink:0;}
+.vinfo{flex:1;}
+.vname2{font-size:12px;font-weight:700;}
+.vspd{font-size:11px;color:rgba(245,237,216,0.5);margin-top:2px;}
+.vdice{font-size:24px;min-width:32px;text-align:center;flex-shrink:0;}
+.vres{margin-top:11px;padding:9px 13px;background:rgba(201,151,58,0.1);border:1px solid rgba(201,151,58,0.3);border-radius:8px;font-size:12px;}
+.vord{display:flex;align-items:center;gap:4px;justify-content:center;flex-wrap:wrap;margin-top:4px;}
+.varr{color:rgba(245,237,216,0.4);font-size:13px;}
+.dbtn{background:linear-gradient(135deg,#6C3483,#9B59B6);color:white;border:none;border-radius:8px;padding:11px 22px;font-family:'Cinzel',serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;margin-top:11px;transition:all 0.2s;letter-spacing:1px;}
+.dbtn:hover{transform:translateY(-2px);}
+.dbtn:disabled{opacity:0.4;cursor:not-allowed;}
+/* AI ANN */
+.aa{text-align:center;padding:6px 0;}
+.aaem{font-size:40px;margin-bottom:9px;}
+.aat{font-family:'Cinzel',serif;font-size:16px;color:var(--gold2);margin-bottom:7px;}
+.aab{background:rgba(0,0,0,0.3);border-radius:8px;padding:12px;margin:9px 0;}
+.aad{font-size:13px;color:rgba(245,237,216,0.8);margin-bottom:4px;}
+.aar{font-size:13px;font-weight:700;}
+.aac{font-size:11px;color:rgba(245,237,216,0.4);margin-top:7px;}
+.aap{display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:12px;}
+.aadot{width:9px;height:9px;border-radius:50%;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px;}
+</style>
+</head>
+<body>
+<div id="setup">
+  <div class="ttl">
+    <span class="sanim">⛵</span>
+    <h1>大航海時代</h1>
+    <p>— スパイス貿易会社 —</p>
+  </div>
+  <div class="card">
+    <h2>⚓ ゲーム設定</h2>
+    <div id="psetup">
+      <div class="pr">
+        <div class="pn" style="color:#E74C3C">1</div>
+        <input class="pi" id="pn0" placeholder="東洋商会" maxlength="10">
+        <select class="ps" id="pt0"><option value="human">人間</option><option value="ai">AI</option></select>
+        <div class="tog on" id="pg0" onclick="togP(0)"></div>
+      </div>
+      <div class="pr">
+        <div class="pn" style="color:#3498DB">2</div>
+        <input class="pi" id="pn1" placeholder="大陸交易" maxlength="10">
+        <select class="ps" id="pt1"><option value="human">人間</option><option value="ai">AI</option></select>
+        <div class="tog on" id="pg1" onclick="togP(1)"></div>
+      </div>
+      <div class="pr">
+        <div class="pn" style="color:#2ECC71">3</div>
+        <input class="pi" id="pn2" placeholder="海洋貿易" maxlength="10">
+        <select class="ps" id="pt2"><option value="human">人間</option><option value="ai">AI</option></select>
+        <div class="tog" id="pg2" onclick="togP(2)"></div>
+      </div>
+      <div class="pr">
+        <div class="pn" style="color:#F39C12">4</div>
+        <input class="pi" id="pn3" placeholder="黄金航路" maxlength="10">
+        <select class="ps" id="pt3"><option value="human">人間</option><option value="ai">AI</option></select>
+        <div class="tog" id="pg3" onclick="togP(3)"></div>
+      </div>
+    </div>
+    <button class="sbtn" onclick="startGame()">🌊 出航する！</button>
+  </div>
+</div>
+
+<div id="game">
+  <div class="gh">
+    <div>
+      <div class="gt" id="tdisp">第1ターン / 全5ターン</div>
+      <div style="font-size:12px;opacity:0.7" id="pdisp">準備フェーズ</div>
+    </div>
+    <div class="gp" id="pbadge">準備</div>
+  </div>
+  <div class="pb">
+    <div class="ps2 active" id="pp0">⚙️ 準備</div>
+    <div class="ps2" id="pp1">🌊 仕入れ</div>
+    <div class="ps2" id="pp2">💰 販売</div>
+    <div class="ps2" id="pp3">📊 決算</div>
+    <div class="ps2" id="pp4">💎 配当</div>
+  </div>
+  <div class="pg" id="pgrid"></div>
+  <div class="ap" id="apanel">
+    <h3 id="atitle">準備フェーズ</h3>
+    <div class="ab" id="abtns"></div>
+    <div style="margin-top:10px;text-align:right">
+      <button class="btn bgy" style="font-size:11px;padding:5px 10px" onclick="showRules()">📖 ルール説明</button>
+    </div>
+  </div>
+  <div class="mg" id="mgrids" style="display:none"></div>
+  <div class="ip">
+    <h3>🏦 投資家</h3>
+    <div class="ig" id="igrids"></div>
+  </div>
+  <div class="lp">
+    <h3>📜 ゲームログ</h3>
+    <div id="glog"></div>
+  </div>
+</div>
+
+<div class="ov" id="ov-voyage">
+  <div class="mo">
+    <div id="voyage-content"></div>
+    <button class="dbtn" id="voyage-btn" style="display:none">🌊 出航！</button>
+  </div>
+</div>
+<div class="ov" id="ov-ai">
+  <div class="mo">
+    <div id="ai-content"></div>
+    <div class="mb"><button class="btn bg" id="ai-next" style="width:100%;justify-content:center">次へ →</button></div>
+  </div>
+</div>
+<div class="ov" id="ov-inv">
+  <div class="mo">
+    <h2>🏦 投資家が動きました！</h2>
+    <div id="inv-content"></div>
+    <div class="mb"><button class="btn bg" id="inv-next" style="width:100%;justify-content:center">次へ →</button></div>
+  </div>
+</div>
+<div class="ov" id="ov-ship">
+  <div class="mo"><h2>⚓ 船の強化</h2><div id="ship-content"></div></div>
+</div>
+<div class="ov" id="ov-stock">
+  <div class="mo"><h2>📈 株の売買</h2><div id="stock-content"></div></div>
+</div>
+<div class="ov" id="ov-buy">
+  <div class="mo"><h2>🐘 南アジア市場で仕入れ</h2><div id="buy-content"></div></div>
+</div>
+<div class="ov" id="ov-sell">
+  <div class="mo"><h2>🏰 ヨーロッパ市場で販売</h2><div id="sell-content"></div></div>
+</div>
+<div class="ov" id="ov-results">
+  <div class="mo">
+    <h2 id="rtitle">📊 決算発表</h2>
+    <div id="rcontent"></div>
+    <div class="mb"><button class="btn bg" id="rbtn" style="width:100%;justify-content:center">次へ →</button></div>
+  </div>
+</div>
+
+<!-- ルール説明モーダル -->
+<div class="ov" id="ov-rules">
+  <div class="mo">
+    <h2>📖 ルール説明</h2>
+    <div id="rules-content"></div>
+    <div class="mb"><button class="btn bg" onclick="closeOv('rules')" style="width:100%;justify-content:center">✅ 閉じる</button></div>
+  </div>
+</div>
+
+<script>
+var COLORS=['#E74C3C','#3498DB','#2ECC71','#F39C12'];
+var CNAMES=['東洋商会','大陸交易','海洋貿易','黄金航路'];
+var GOODS=['スパイス','お茶','シルク'];
+var GICON={'スパイス':'[S]','お茶':'[T]','シルク':'[K]'};
+var GNAME={'スパイス':'スパイス','お茶':'お茶','シルク':'シルク'};
+var DICE=['1','2','3','4','5','6'];
+var SP_UPGC=[0,3,5,10];   // スピード強化費用
+var CG_UPGC=[0,10,20,30]; // 積荷強化費用
+var UPGC=SP_UPGC; // 後方互換用（使わなくなるが念のため）
+var BMKT={
+  'スパイス':[{p:1,s:4},{p:2,s:6},{p:3,s:6},{p:4,s:6},{p:5,s:6},{p:6,s:4}],
+  'お茶':[{p:2,s:6},{p:3,s:6},{p:4,s:6},{p:5,s:6},{p:6,s:6}],
+  'シルク':[{p:3,s:6},{p:4,s:6},{p:5,s:6},{p:6,s:6}]
+};
+var SMKT={
+  'スパイス':[{p:7,s:4},{p:8,s:6},{p:9,s:8},{p:10,s:4},{p:11,s:4}],
+  'お茶':[{p:8,s:4},{p:9,s:4},{p:10,s:8},{p:11,s:8}],
+  'シルク':[{p:9,s:4},{p:10,s:4},{p:11,s:8},{p:12,s:6}]
+};
+var G={};
+
+function mkP(cfg,i){return{id:i,name:cfg.name||CNAMES[i],isAI:cfg.isAI,color:COLORS[i],cash:20,hasShip:false,shipValue:0,shipAge:0,speedLv:1,cargoLv:1,stocks:10,stockPrice:4,holdings:{},cargo:[],profit:0,revenue:0,cost:0};}
+function mkI(i){return{id:i,name:'投資家'+(i+1),cash:40,holdings:{}};}
+
+function initState(cfgs){
+  var players=cfgs.map(function(c,i){return mkP(c,i);});
+  var investors=[0,1,2,3,4].map(function(i){return mkI(i);});
+  var bm={},sm={};
+  GOODS.forEach(function(g){
+    bm[g]=BMKT[g].map(function(t){return{p:t.p,s:t.s,taken:0};});
+    sm[g]=SMKT[g].map(function(t){return{p:t.p,s:t.s,taken:0};});
+  });
+  G={players:players,investors:investors,turn:1,maxTurns:7,phase:0,bm:bm,sm:sm,log:[],arrOrder:[],setupDone:[],buyDone:[],sellDone:[]};
+}
+
+function buildSetupUI(){
+  var c=document.getElementById('psetup');
+  c.innerHTML='';
+  for(var i=0;i<4;i++){
+    c.innerHTML+='<div class="pr">'
+      +'<div class="pn" style="color:'+COLORS[i]+'">'+(i+1)+'</div>'
+      +'<input class="pi" id="pn'+i+'" placeholder="'+CNAMES[i]+'" maxlength="10">'
+      +'<select class="ps" id="pt'+i+'"><option value="human">人間</option><option value="ai">AI</option></select>'
+      +'<div class="tog '+(i<2?'on':'')+'" id="pg'+i+'" onclick="togP('+i+')"></div>'
+      +'</div>';
+  }
+}
+function togP(i){document.getElementById('pg'+i).classList.toggle('on');}
+
+function startGame(){
+  try {
+    var cfgs=[];
+    for(var i=0;i<4;i++){
+      var tog=document.getElementById('pg'+i);
+      if(tog && tog.classList.contains('on')){
+        var nm=document.getElementById('pn'+i);
+        var tp=document.getElementById('pt'+i);
+        cfgs.push({name:(nm?nm.value:'')||CNAMES[i],isAI:tp?tp.value==='ai':false});
+      }
+    }
+    if(!cfgs.length){alert('最低1人必要です');return;}
+    initState(cfgs);
+    document.getElementById('setup').style.display='none';
+    document.getElementById('game').style.display='block';
+    glog('ゲーム開始！大航海時代の幕が上がりました');
+    renderAll();
+    startPhase(0);
+  } catch(e) {
+    alert('エラーが発生しました: ' + e.message);
+    console.error(e);
+  }
+}
+
+function renderAll(){renderHdr();renderPBar();renderPlayers();renderInvs();}
+
+function renderHdr(){
+  var names=['準備フェーズ','仕入れフェーズ','販売フェーズ','決算フェーズ','配当フェーズ'];
+  var bdg=['⚙️準備','🌊仕入れ','💰販売','📊決算','💎配当'];
+  document.getElementById('tdisp').textContent='第'+G.turn+'ターン / 全'+G.maxTurns+'ターン';
+  document.getElementById('pdisp').textContent=names[G.phase];
+  document.getElementById('pbadge').textContent=bdg[G.phase];
+}
+
+function renderPBar(){
+  for(var i=0;i<5;i++){
+    var el=document.getElementById('pp'+i);
+    el.className='ps2'+(i===G.phase?' active':i<G.phase?' done':'');
+  }
+}
+
+function renderPlayers(){
+  var grid=document.getElementById('pgrid');
+  grid.innerHTML=G.players.map(function(p){
+    var ov=0;
+    Object.entries(p.holdings).forEach(function(e){
+      var op=G.players[e[0]];
+      if(op) ov+=e[1]*op.stockPrice;
+    });
+    var total=p.cash+p.shipValue+(p.stocks*p.stockPrice)+ov;
+    var shi=p.hasShip
+      ?'<div class="sbg">⛵ 船あり</div><div class="sbg">速Lv'+p.speedLv+'</div><div class="sbg">積Lv'+p.cargoLv+'</div>'
+      :'<span style="font-size:11px;opacity:0.4">船なし</span>';
+    var cah=p.cargo.length
+      ?p.cargo.map(function(c){return'<div class="ci">'+c.good+'</div>';}).join('')
+      :'<span style="font-size:11px;opacity:0.4">積荷なし</span>';
+    var osh='';
+    if(ov>0){
+      var parts=[];
+      Object.entries(p.holdings).forEach(function(e){
+        if(e[1]>0){var op=G.players[e[0]];if(op)parts.push('<span style="color:'+op.color+'">'+op.name+'x'+e[1]+'('+e[1]*op.stockPrice+'億)</span>');}
+      });
+      osh='<div class="os">他社株: '+parts.join(' ')+' 計'+ov+'億</div>';
+    }
+    var isActive=G.phase===0&&G.setupDone.indexOf(p.id)===-1;
+    return'<div class="pc'+(isActive?' active':'')+'" style="--cc:'+p.color+'">'
+      +'<div class="pch"><div class="pcn" style="color:'+p.color+'">'+p.name+'</div><div class="pct">'+(p.isAI?'🤖 AI':'👤 人間')+'</div></div>'
+      +'<div class="sg">'
+      +'<div class="sb"><div class="sl">💴 手持ち</div><div class="sv g">'+p.cash+'億円</div></div>'
+      +'<div class="sb"><div class="sl">🏛️ 総資産</div><div class="sv">'+total+'億円</div></div>'
+      +'<div class="sb"><div class="sl">📈 株価</div><div class="sv g sm">'+p.stockPrice+'億/株</div></div>'
+      +'<div class="sb"><div class="sl">🗂️ 自社株</div><div class="sv sm">'+p.stocks+'株</div></div>'
+      +'</div>'
+      +'<div class="shr">'+shi+'</div>'
+      +'<div class="cr">'+cah+'</div>'
+      +osh
+      +'</div>';
+  }).join('');
+}
+
+function renderInvs(){
+  document.getElementById('igrids').innerHTML=G.investors.map(function(inv){
+    var parts=[];
+    Object.entries(inv.holdings).forEach(function(e){
+      if(e[1]>0){var p=G.players[e[0]];if(p)parts.push(p.name+':'+e[1]+'株');}
+    });
+    return'<div class="ic"><div class="in2">🏦 '+inv.name+'</div><div style="font-size:12px">💴 '+inv.cash+'億円</div><div class="ih">保有: '+(parts.join(', ')||'なし')+'</div></div>';
+  }).join('');
+}
+
+function renderMarkets(){
+  var grid=document.getElementById('mgrids');
+  grid.style.display='grid';
+  var html='<div class="mp"><h3>🐘 買う市場（南アジア）<br><small style="font-size:10px;opacity:0.6">安い枠から順番に買える</small></h3>';
+  GOODS.forEach(function(g){
+    html+='<div class="mi"><div class="mih"><span>'+g+'</span></div>';
+    G.bm[g].forEach(function(tier){
+      html+='<div class="pl">'+tier.p+'億円</div><div class="sl2">';
+      for(var i=0;i<tier.s;i++){var t=i<tier.taken;html+='<div class="slot '+(t?'slott':'slotb')+'">'+( t?'×':tier.p)+'</div>';}
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='<div class="mp"><h3>🏰 売る市場（ヨーロッパ）<br><small style="font-size:10px;opacity:0.6">高い枠から順番に売れる</small></h3>';
+  GOODS.forEach(function(g){
+    html+='<div class="mi"><div class="mih"><span>'+g+'</span></div>';
+    var tiers=G.sm[g].slice().reverse();
+    tiers.forEach(function(tier){
+      html+='<div class="pl">'+tier.p+'億円</div><div class="sl2">';
+      for(var i=0;i<tier.s;i++){var t=i<tier.taken;html+='<div class="slot '+(t?'slott':'slotsl')+'">'+( t?'×':tier.p)+'</div>';}
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  grid.innerHTML=html;
+}
+
+function glog(msg){
+  G.log.unshift({t:'T'+G.turn,msg:msg});
+  var el=document.getElementById('glog');
+  if(el) el.innerHTML=G.log.slice(0,25).map(function(l){return'<div class="le"><span class="lt">'+l.t+'</span><span>'+l.msg+'</span></div>';}).join('');
+}
+
+function openOv(id){document.getElementById('ov-'+id).classList.add('show');}
+function closeOv(id){document.getElementById('ov-'+id).classList.remove('show');}
+
+function startPhase(ph){
+  G.phase=ph;G.setupDone=[];G.buyDone=[];G.sellDone=[];
+  renderAll();
+  if(ph===0) startPrep();
+  else if(ph===1) startBuy();
+  else if(ph===2) startSell();
+  else if(ph===3) startResults();
+  else if(ph===4) startDiv();
+}
+
+// PREP
+function startPrep(){
+  G.players.forEach(function(p){p.profit=0;p.revenue=0;p.cost=0;});
+  document.getElementById('apanel').style.display='block';
+  document.getElementById('atitle').textContent='⚙️ 準備フェーズ - 船の購入・強化、株の売買';
+  if(G.turn<=2){glog('🏦 第'+G.turn+'ターン：投資家はまだ様子見中');renderInvs();renderPrepBtns();}
+  else{invAI();}
+}
+
+function renderPrepBtns(){
+  var unf=G.players.filter(function(p){return G.setupDone.indexOf(p.id)===-1;});
+  var btns=document.getElementById('abtns');
+  if(!unf.length){btns.innerHTML='<button class="btn bn" onclick="startPhase(1)">🌊 仕入れフェーズへ →</button>';return;}
+  var p=unf[0];
+  if(p.isAI){btns.innerHTML='<div style="color:var(--gold);font-size:13px">🤖 '+p.name+' が行動中...</div>';setTimeout(function(){aiPrep(p);},800);return;}
+  var canB=p.cash>=30;
+  var hint=!p.hasShip&&!canB?'<div class="hint">💡 船(30億)を買うには資金が足りません。まず株を売って資金を作りましょう！</div>':'';
+  var lv1hint=G.turn===1?'<div class="hint" style="background:rgba(52,152,219,0.15);border-color:rgba(52,152,219,0.4);color:#7FC8E8">💡 1ターン目は船のレベルアップができません。まず船を買って航海しましょう！</div>':'';
+  btns.innerHTML='<div style="width:100%;margin-bottom:7px;font-size:13px;color:var(--gold2)">👤 <strong>'+p.name+'</strong> の準備 (手持ち: '+p.cash+'億円)</div>'
+    +hint+lv1hint
+    +'<button class="btn bg" onclick="openStockMod('+p.id+')">📈 株を売買する</button>'
+    +(p.hasShip&&G.turn>1
+      ?'<button class="btn bs" onclick="openShipMod('+p.id+')">🔧 船を強化する</button>'
+      :(!p.hasShip?'<button class="btn bs" onclick="doBS('+p.id+')" '+(canB?'':'disabled')+'>⛵ 船を購入(30億円)</button>':''))
+    +'<button class="btn bgn" onclick="finPrep('+p.id+')">✅ 準備完了</button>';
+}
+
+function doBS(pid){
+  var p=G.players[pid];
+  if(p.cash<30){alert('資金が足りません！まず株を売りましょう。');return;}
+  p.cash-=30;p.hasShip=true;p.shipValue=30;p.shipAge=0;p.cost+=30;
+  glog('⛵ '+p.name+'が船を購入（-30億円）');
+  renderAll();renderPrepBtns();
+}
+
+function finPrep(pid){
+  var p=G.players[pid];
+  if(!p.hasShip&&!confirm('⚠️ '+p.name+'はまだ船がありません。\n株の売買だけで戦う戦略として進めますか？'))return;
+  G.setupDone.push(pid);
+  glog('✅ '+p.name+'の準備完了'+(p.hasShip?'':'（船なし）'));
+  renderAll();renderPrepBtns();
+}
+
+function aiPrep(p){
+  var acts=[];
+  if(!p.hasShip){
+    while(p.cash<30&&p.stocks>0){
+      p.stocks--;p.cash+=p.stockPrice;
+      acts.push({emoji:'📤',title:'自社株を売って資金調達',detail:'1株を'+p.stockPrice+'億円で売却',result:'手持ち: '+p.cash+'億円',color:'#E98080'});
+      glog('🤖 '+p.name+'が自社株1株を'+p.stockPrice+'億で売却');
+    }
+    if(p.cash>=30){
+      p.cash-=30;p.hasShip=true;p.shipValue=30;p.shipAge=0;p.cost+=30;
+      acts.push({emoji:'⛵',title:'船を購入！',detail:'30億円で船を購入',result:'残り: '+p.cash+'億円',color:'#7FC8E8'});
+      glog('⛵ '+p.name+'が船を購入');
+    }
+  }
+  // 1ターン目はレベルアップ禁止・1ターン1レベルのみ
+  if(G.turn>1&&p.hasShip){
+    var upgraded=false;
+    // AIの戦略：スピードを先に上げてから積荷を上げる
+    if(!upgraded&&p.speedLv<4){
+      var sc=SP_UPGC[p.speedLv];
+      if(p.cash>=sc){
+        p.cash-=sc;p.cost+=sc;p.speedLv++;upgraded=true;
+        acts.push({emoji:'🚀',title:'スピードLv'+p.speedLv+'に強化！',detail:'費用: '+sc+'億円（維持費なし）',result:'残り: '+p.cash+'億円',color:'#7FC8E8'});
+        glog('🤖 '+p.name+'がスピードLv'+p.speedLv+'にアップ（-'+sc+'億）');
+      }
+    }
+    if(!upgraded&&p.cargoLv<4){
+      var cc=CG_UPGC[p.cargoLv];
+      var maintIncrease=1;
+      if(p.cash>=cc+maintIncrease*3){// 維持費増加分も考慮して余裕があれば強化
+        p.cash-=cc;p.cost+=cc;p.cargoLv++;upgraded=true;
+        acts.push({emoji:'📦',title:'積荷Lv'+p.cargoLv+'に強化！',detail:'費用: '+cc+'億円（維持費+1億/ターン）',result:'残り: '+p.cash+'億円',color:'#F0C060'});
+        glog('🤖 '+p.name+'が積荷Lv'+p.cargoLv+'にアップ（-'+cc+'億）');
+      }
+    }
+  }
+  if(!acts.length)acts.push({emoji:'💤',title:'今ターンは様子見',detail:'特に行動しませんでした',result:'手持ち: '+p.cash+'億円',color:'rgba(245,237,216,0.5)'});
+  showAiAnn(p,acts,0,function(){G.setupDone.push(p.id);renderAll();renderPrepBtns();});
+}
+
+// INV AI
+function invAI(){
+  // 各投資家に「好きな順位」を割り当てて分散させる
+  // 投資家0→1位好き、投資家1→2位好き、投資家2→3位好き、投資家3→4位好き、投資家4→ランダム
+  var ranked=G.players.slice().sort(function(a,b){return b.stockPrice-a.stockPrice;});
+  var acts=[];
+  G.investors.forEach(function(inv,idx){
+    var target=null;
+    if(idx<ranked.length){
+      // 担当順位の会社を優先、売り出し株がなければ次の会社へ
+      var pref=ranked[idx];
+      if(pref.stocks>0&&inv.cash>=pref.stockPrice){
+        target=pref;
+      } else {
+        // 担当会社が買えなければ他を探す
+        for(var i=0;i<ranked.length;i++){
+          if(ranked[i].stocks>0&&inv.cash>=ranked[i].stockPrice){target=ranked[i];break;}
+        }
+      }
+    } else {
+      // 余った投資家はランダムに選ぶ
+      var shuffled=ranked.slice().sort(function(){return Math.random()-0.5;});
+      for(var j=0;j<shuffled.length;j++){
+        if(shuffled[j].stocks>0&&inv.cash>=shuffled[j].stockPrice){target=shuffled[j];break;}
+      }
+    }
+    if(!target)return;
+    var bought=target.stockPrice;
+    inv.cash-=bought;target.stocks--;target.cash+=bought;
+    if(!inv.holdings[target.id])inv.holdings[target.id]=0;
+    inv.holdings[target.id]++;
+    target.stockPrice++;
+    acts.push({inv:inv,target:target,bought:bought,newP:target.stockPrice});
+    glog('🏦 '+inv.name+'が'+target.name+'株を'+bought+'億で購入 → 株価'+target.stockPrice+'億に上昇');
+  });
+  if(!acts.length){renderInvs();renderAll();renderPrepBtns();return;}
+  showInvAnn(acts,0);
+}
+
+function showInvAnn(acts,idx){
+  if(idx>=acts.length){closeOv('inv');renderInvs();renderAll();renderPrepBtns();return;}
+  var a=acts[idx];var p=G.players[a.target.id];
+  document.getElementById('inv-content').innerHTML=
+    '<div style="text-align:center;padding:7px 0">'
+    +'<div style="font-size:40px;margin-bottom:9px">🏦</div>'
+    +'<div style="font-size:14px;color:var(--gold2);margin-bottom:7px"><strong>'+a.inv.name+'</strong>が株を購入しました！</div>'
+    +'<div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:13px;margin:9px 0">'
+    +'<div style="font-size:12px;margin-bottom:4px"><span style="color:'+p.color+'">'+p.name+'</span>の株を</div>'
+    +'<div style="font-size:24px;font-family:Cinzel,serif;color:var(--gold2)">'+a.bought+'億円</div>'
+    +'<div style="font-size:11px;opacity:0.6;margin-top:3px">で1株購入</div></div>'
+    +'<div style="font-size:13px">'+a.bought+'億 → <strong style="color:#7DCEA0;font-size:17px">📈 '+a.newP+'億</strong></div>'
+    +'<div style="font-size:11px;opacity:0.5;margin-top:4px">株価1億上昇！（'+p.name+'の口座に'+a.bought+'億入金）</div>'
+    +'</div>';
+  document.getElementById('inv-next').textContent=idx<acts.length-1?'次の投資家へ → ('+(idx+2)+'/'+acts.length+')':'✅ 準備フェーズへ';
+  document.getElementById('inv-next').onclick=function(){showInvAnn(acts,idx+1);};
+  openOv('inv');
+}
+
+function showAiAnn(player,acts,idx,onDone){
+  if(idx>=acts.length){closeOv('ai');onDone();return;}
+  var a=acts[idx];var isLast=idx===acts.length-1;
+  document.getElementById('ai-content').innerHTML=
+    '<div class="aa">'
+    +'<div class="aap"><div class="aadot" style="background:'+player.color+'"></div>'
+    +'<span style="font-family:Cinzel,serif;color:'+player.color+';font-size:14px">'+player.name+'</span>'
+    +'<span style="font-size:11px;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:9px;color:rgba(245,237,216,0.6)">🤖 AI</span></div>'
+    +'<div class="aaem">'+a.emoji+'</div>'
+    +'<div class="aat">'+a.title+'</div>'
+    +'<div class="aab"><div class="aad">'+a.detail+'</div><div class="aar" style="color:'+a.color+'">'+a.result+'</div></div>'
+    +'<div class="aac">'+(idx+1)+' / '+acts.length+' 件目の行動</div>'
+    +'</div>';
+  document.getElementById('ai-next').textContent=isLast?'✅ 確認した！':'次へ → ('+(idx+2)+'/'+acts.length+')';
+  document.getElementById('ai-next').onclick=function(){showAiAnn(player,acts,idx+1,onDone);};
+  openOv('ai');
+}
+
+// SHIP MODAL
+var shipCart={};
+function openShipMod(pid){
+  // 1ターンに強化済みかチェック
+  shipCart={pid:pid,spd:0,crg:0};
+  renderShipMod();openOv('ship');
+}
+function renderShipMod(){
+  var p=G.players[shipCart.pid];
+  var sc=p.speedLv<4?SP_UPGC[p.speedLv]:null;
+  var cc=p.cargoLv<4?CG_UPGC[p.cargoLv]:null;
+  var tot=(shipCart.spd&&sc?sc:0)+(shipCart.crg&&cc?cc:0);
+  var pc=p.cash-tot;
+  var pvS=p.speedLv+shipCart.spd;var pvC=p.cargoLv+shipCart.crg;
+  // 1ターン1レベル制限：スピードかどちらかを選んだら他方はロック
+  var spdLocked=shipCart.crg>0;
+  var crgLocked=shipCart.spd>0;
+  document.getElementById('ship-content').innerHTML=
+    '<div style="font-size:12px;margin-bottom:11px">💴 手持ち: <strong style="color:var(--gold2)">'+p.cash+'億円</strong>'+(tot>0?' → <strong style="color:#7DCEA0">'+pc+'億円</strong>':'')+'</div>'
+    +'<div style="font-size:11px;padding:5px 10px;background:rgba(52,152,219,0.15);border-radius:6px;margin-bottom:10px;color:#7FC8E8">💡 1ターンに強化できるのはスピードか積荷のどちらか1段階のみです</div>'
+    +'<div class="or"><div class="oi"><div>🚀 スピード強化</div><div style="font-size:11px;opacity:0.7">Lv'+p.speedLv+' → <span style="color:'+(shipCart.spd?'#7DCEA0':'var(--cream)')+'">Lv'+pvS+'</span></div><div class="oc">'+(sc?'費用: '+sc+'億円（維持費なし）':'最大レベル')+'</div></div>'
+    +(shipCart.spd
+      ?'<button class="btn br" style="padding:5px 9px" onclick="scChg(\'spd\',-1)">－ 取消</button>'
+      :(spdLocked?'<button class="btn bgy" style="padding:5px 9px" disabled>積荷選択中</button>'
+        :(sc&&pc>=sc?'<button class="btn bs" style="padding:5px 9px" onclick="scChg(\'spd\',1)">＋ 追加</button>':'<button class="btn bgy" style="padding:5px 9px" disabled>'+(sc?'資金不足':'MAX')+'</button>')))
+    +'</div>'
+    +'<div class="or"><div class="oi"><div>📦 積荷強化</div><div style="font-size:11px;opacity:0.7">Lv'+p.cargoLv+'('+p.cargoLv+'枠) → <span style="color:'+(shipCart.crg?'#7DCEA0':'var(--cream)')+'">Lv'+pvC+'('+pvC+'枠)</span></div><div class="oc">'+(cc?'費用: '+cc+'億円（維持費+1億/ターン）':'最大レベル')+'</div></div>'
+    +(shipCart.crg
+      ?'<button class="btn br" style="padding:5px 9px" onclick="scChg(\'crg\',-1)">－ 取消</button>'
+      :(crgLocked?'<button class="btn bgy" style="padding:5px 9px" disabled>スピード選択中</button>'
+        :(cc&&pc>=cc?'<button class="btn bg" style="padding:5px 9px" onclick="scChg(\'crg\',1)">＋ 追加</button>':'<button class="btn bgy" style="padding:5px 9px" disabled>'+(cc?'資金不足':'MAX')+'</button>')))
+    +'</div>'
+    +(tot>0?'<div class="cbox">🛒 合計: <strong style="color:#7DCEA0">'+tot+'億円</strong>'+(shipCart.crg?'<span style="font-size:11px;color:#E98080;margin-left:8px">※維持費が+1億/ターン増えます</span>':'')+'</div>':'<div style="font-size:12px;opacity:0.5;text-align:center;margin-top:7px">強化項目を選んでください</div>')
+    +'<div class="mb"><button class="btn bgy" onclick="closeOv(\'ship\')">キャンセル</button>'
+    +'<button class="btn bg" onclick="confShip()" '+(tot===0?'disabled':'')+'>✅ '+(tot>0?tot+'億円で確定':'未選択')+'</button></div>';
+}
+function scChg(type,d){shipCart[type]=Math.max(0,Math.min(1,shipCart[type]+d));renderShipMod();}
+function confShip(){
+  var p=G.players[shipCart.pid];
+  var sc2=shipCart.spd&&p.speedLv<4?SP_UPGC[p.speedLv]:0;
+  var cc2=shipCart.crg&&p.cargoLv<4?CG_UPGC[p.cargoLv]:0;
+  if(p.cash<sc2+cc2){alert('資金が足りません！');return;}
+  if(shipCart.spd){p.cash-=sc2;p.cost+=sc2;p.speedLv++;glog('🚀 '+p.name+'がスピードLv'+p.speedLv+'にアップ（-'+sc2+'億）');}
+  if(shipCart.crg){p.cash-=cc2;p.cost+=cc2;p.cargoLv++;glog('📦 '+p.name+'が積荷Lv'+p.cargoLv+'にアップ（-'+cc2+'億）');}
+  closeOv('ship');renderAll();renderPrepBtns();
+}
+
+// STOCK MODAL
+var stkCart={};
+function openStockMod(pid){stkCart={pid:pid,sell:0,buy:{},sellOther:{}};renderStkMod();openOv('stock');}
+function renderStkMod(){
+  var p=G.players[stkCart.pid];
+  var sRev=stkCart.sell*p.stockPrice;
+  var bTot=0;
+  Object.entries(stkCart.buy).forEach(function(e){var op=G.players[e[0]];if(op)bTot+=e[1]*op.stockPrice;});
+  // 他社株売却収入
+  var soRev=0;
+  Object.entries(stkCart.sellOther||{}).forEach(function(e){var op=G.players[e[0]];if(op)soRev+=e[1]*op.stockPrice;});
+  var net=sRev+soRev-bTot;var pc=p.cash+net;var ps=p.stocks-stkCart.sell;
+  var html='<div style="font-size:12px;padding:7px 11px;background:rgba(0,0,0,0.3);border-radius:7px;margin-bottom:11px">'
+    +'💴 手持ち: <strong style="color:var(--gold2)">'+p.cash+'億円</strong>'+(net!==0?' → <strong style="color:'+(pc>=0?'#7DCEA0':'#E74C3C')+'">'+pc+'億円</strong>':'')
+    +' | 自社株: '+p.stocks+'株'+(stkCart.sell>0?' → <strong style="color:#E98080">'+ps+'株</strong>':'')+'</div>';
+
+  // 自社株を売る
+  html+='<div class="msec"><h3>📤 自社株を売る (1株='+p.stockPrice+'億円)</h3>'
+    +'<div class="or"><div class="oi"><div>カート: <strong style="color:#E98080">'+stkCart.sell+'株</strong></div><div class="oc">売却収入: +'+sRev+'億円</div></div>'
+    +'<div class="pmr"><button class="btn br" style="padding:4px 9px" onclick="sChg(\'sell\',-1)" '+(stkCart.sell===0?'disabled':'')+'>－</button>'
+    +'<span class="pmv">'+stkCart.sell+'</span>'
+    +'<button class="btn bg" style="padding:4px 9px" onclick="sChg(\'sell\',1)" '+(ps<=0?'disabled':'')+'>＋</button></div></div></div>';
+
+  // 他社株の売買（持っている株は売れる、売り出し中の株は買える）
+  html+='<div class="msec"><h3>🔄 他社株の売買</h3>';
+  G.players.forEach(function(op){
+    if(op.id===stkCart.pid)return;
+    var held=p.holdings[op.id]||0; // 保有株（売れる）
+    var avail=op.stocks; // 売り出し中（買える）
+    var cntBuy=stkCart.buy[op.id]||0;
+    var cntSell=(stkCart.sellOther||{})[op.id]||0;
+    var maxB=Math.min(avail,Math.floor((pc+cntBuy*op.stockPrice)/op.stockPrice));
+    html+='<div style="margin-bottom:8px;padding:8px 11px;background:rgba(0,0,0,0.25);border-radius:7px;border-left:3px solid '+op.color+'">'
+      +'<div style="font-size:12px;color:'+op.color+';font-weight:700;margin-bottom:5px">'+op.name+' ('+op.stockPrice+'億/株)</div>'
+      // 買う
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+      +'<div style="font-size:11px;opacity:0.7">📥 買う（売出: '+avail+'株）</div>'
+      +'<div class="pmr"><button class="btn br" style="padding:3px 8px;font-size:11px" onclick="sChg(\'buy\','+op.id+',-1)" '+(cntBuy===0?'disabled':'')+'>－</button>'
+      +'<span class="pmv" style="font-size:13px">'+cntBuy+'</span>'
+      +'<button class="btn bs" style="padding:3px 8px;font-size:11px" onclick="sChg(\'buy\','+op.id+',1)" '+(maxB<=cntBuy||avail<=0?'disabled':'')+'>＋</button></div></div>'
+      // 売る
+      +(held>0
+        ?'<div style="display:flex;justify-content:space-between;align-items:center">'
+          +'<div style="font-size:11px;opacity:0.7">📤 売る（保有: '+held+'株）</div>'
+          +'<div class="pmr"><button class="btn br" style="padding:3px 8px;font-size:11px" onclick="sChg(\'sellOther\','+op.id+',-1)" '+(cntSell===0?'disabled':'')+'>－</button>'
+          +'<span class="pmv" style="font-size:13px">'+cntSell+'</span>'
+          +'<button class="btn bg" style="padding:3px 8px;font-size:11px" onclick="sChg(\'sellOther\','+op.id+',1)" '+(cntSell>=held?'disabled':'')+'>＋</button></div></div>'
+        :'<div style="font-size:11px;opacity:0.4">（保有株なし・売れません）</div>')
+      +'</div>';
+  });
+  html+='</div>';
+
+  var hasA=stkCart.sell>0||Object.values(stkCart.buy).some(function(v){return v>0;})||Object.values(stkCart.sellOther||{}).some(function(v){return v>0;});
+  if(hasA)html+='<div class="cbox">🛒 差し引き: <strong style="color:'+(net>=0?'#7DCEA0':'#E98080')+'">'+(net>=0?'+':'')+net+'億円</strong></div>';
+  html+='<div class="mb"><button class="btn bgy" onclick="closeOv(\'stock\')">キャンセル</button>'
+    +'<button class="btn bg" onclick="confStk()" '+(hasA?'':'disabled')+'>✅ '+(hasA?'確定する':'変更なし')+'</button></div>';
+  document.getElementById('stock-content').innerHTML=html;
+}
+function sChg(type){
+  var d,tid;
+  if(type==='sell'){d=arguments[1];var p=G.players[stkCart.pid];stkCart.sell=Math.max(0,Math.min(p.stocks,stkCart.sell+d));}
+  else if(type==='buy'){tid=arguments[1];d=arguments[2];if(!stkCart.buy[tid])stkCart.buy[tid]=0;stkCart.buy[tid]=Math.max(0,stkCart.buy[tid]+d);}
+  else if(type==='sellOther'){
+    tid=arguments[1];d=arguments[2];
+    if(!stkCart.sellOther)stkCart.sellOther={};
+    if(!stkCart.sellOther[tid])stkCart.sellOther[tid]=0;
+    var p2=G.players[stkCart.pid];
+    var maxSell=p2.holdings[tid]||0;
+    stkCart.sellOther[tid]=Math.max(0,Math.min(maxSell,stkCart.sellOther[tid]+d));
+  }
+  renderStkMod();
+}
+function confStk(){
+  var p=G.players[stkCart.pid];
+  // 自社株売却
+  if(stkCart.sell>0){var rev=stkCart.sell*p.stockPrice;p.stocks-=stkCart.sell;p.cash+=rev;glog('📤 '+p.name+'が自社株'+stkCart.sell+'株を合計'+rev+'億で売却');}
+  // 他社株売却
+  Object.entries(stkCart.sellOther||{}).forEach(function(e){
+    var tid=e[0];var cnt=e[1];if(!cnt)return;
+    var op=G.players[tid];var rev2=cnt*op.stockPrice;
+    p.cash+=rev2;op.stocks+=cnt;
+    p.holdings[tid]=(p.holdings[tid]||0)-cnt;
+    glog('📤 '+p.name+'が'+op.name+'株'+cnt+'株を合計'+rev2+'億で売却');
+  });
+  // 他社株購入
+  Object.entries(stkCart.buy).forEach(function(e){
+    var tid=e[0];var cnt=e[1];if(!cnt)return;
+    var seller=G.players[tid];var cost=cnt*seller.stockPrice;
+    if(p.cash<cost){alert(seller.name+'株の資金が足りません');return;}
+    p.cash-=cost;seller.stocks-=cnt;seller.cash+=cost;
+    if(!p.holdings[tid])p.holdings[tid]=0;p.holdings[tid]+=cnt;
+    glog('📥 '+p.name+'が'+seller.name+'株'+cnt+'株を合計'+cost+'億で購入');
+  });
+  closeOv('stock');renderAll();
+  if(G.phase===0)renderPrepBtns();
+}
+
+// BUY PHASE
+function startBuy(){
+  var ws=G.players.filter(function(p){return p.hasShip;});
+  G.players.filter(function(p){return!p.hasShip;}).forEach(function(p){G.buyDone.push(p.id);});
+  ws.sort(function(a,b){return b.speedLv!==a.speedLv?b.speedLv-a.speedLv:Math.random()-0.5;});
+  G.arrOrder=ws.map(function(p){return p.id;});
+  showVoyage('buy',function(){renderMarkets();renderBuyActs();});
+}
+function renderBuyActs(){
+  var nd=G.arrOrder.filter(function(id){return G.buyDone.indexOf(id)===-1;});
+  document.getElementById('apanel').style.display='block';
+  if(!nd.length){document.getElementById('atitle').textContent='🌊 仕入れ完了！';document.getElementById('abtns').innerHTML='<button class="btn bn" onclick="startPhase(2)">💰 販売フェーズへ →</button>';return;}
+  var p=G.players[nd[0]];
+  document.getElementById('atitle').textContent='🌊 仕入れフェーズ - '+p.name+'の番（手持ち: '+p.cash+'億円）';
+  if(p.isAI){document.getElementById('abtns').innerHTML='<div style="color:var(--gold);font-size:13px">🤖 '+p.name+' が仕入れ中...</div>';setTimeout(function(){aiBuy(p);},1000);return;}
+  document.getElementById('abtns').innerHTML='<button class="btn bs" onclick="openBuyMod('+p.id+')">🛒 商品を仕入れる</button><button class="btn bgn" onclick="finBuy('+p.id+')">✅ 仕入れせずに完了</button>';
+}
+
+var buyCart={};
+function openBuyMod(pid){buyCart={pid:pid,items:[]};renderBuyMod();openOv('buy');}
+function renderBuyMod(){
+  var p=G.players[buyCart.pid];
+  var max=p.cargoLv;var used=p.cargo.length+buyCart.items.length;
+  var cost=buyCart.items.reduce(function(s,i){return s+i.price;},0);
+  var pc=p.cash-cost;
+  var html='<div style="font-size:12px;padding:7px 11px;background:rgba(0,0,0,0.3);border-radius:7px;margin-bottom:9px">'
+    +'💴 手持ち: <strong style="color:var(--gold2)">'+p.cash+'億円</strong>'+(cost>0?' → <strong style="color:#7DCEA0">'+pc+'億円</strong>':'')
+    +' | 📦 積荷: <strong>'+used+'/'+max+'枠</strong></div>';
+  if(used>=max)html+='<div style="color:#E74C3C;font-size:13px;margin-bottom:7px">⚠️ 積荷がいっぱいです！</div>';
+  GOODS.forEach(function(g){
+    html+='<div style="margin-bottom:11px"><div style="font-size:12px;font-weight:700;margin-bottom:4px">'+g+'</div>';
+    G.bm[g].forEach(function(tier,ti){
+      var cn=buyCart.items.filter(function(i){return i.good===g&&i.ti===ti;}).length;
+      var av=tier.s-tier.taken-cn;
+      var canA=av>0&&pc>=tier.p&&used<max;
+      html+='<div class="or" style="margin-bottom:3px"><div class="oi">'+tier.p+'億円/個 <span style="font-size:10px;opacity:0.6">(残'+av+'枠)</span>'+(cn>0?'<span style="color:#7DCEA0;font-size:11px"> カート'+cn+'個</span>':'')+'</div>'
+        +'<div class="pmr"><button class="btn br" style="padding:4px 8px;font-size:12px" onclick="bCartC(\''+g+'\','+ti+',-1)" '+(cn===0?'disabled':'')+'>－</button>'
+        +'<span class="pmv">'+cn+'</span>'
+        +'<button class="btn bs" style="padding:4px 8px;font-size:12px" onclick="bCartC(\''+g+'\','+ti+',1)" '+(canA?'':'disabled')+'>＋</button></div></div>';
+    });
+    html+='</div>';
+  });
+  if(p.cargo.length){html+='<div style="font-size:12px;color:var(--gold);margin-top:5px">📦 既存の積荷:</div>';p.cargo.forEach(function(c){html+='<div style="font-size:11px;opacity:0.7">'+c.good+'('+c.cost+'億仕入済)</div>';});}
+  if(buyCart.items.length)html+='<div class="cbox">🛒 カート: '+buyCart.items.length+'個 合計 <strong style="color:#7DCEA0">'+cost+'億円</strong></div>';
+  html+='<div class="mb"><button class="btn bgy" onclick="closeOv(\'buy\')">キャンセル</button><button class="btn bs" onclick="confBuy()" '+(buyCart.items.length?'':'disabled')+'>✅ '+(buyCart.items.length?cost+'億円で仕入れ確定':'商品を選んでください')+'</button></div>';
+  document.getElementById('buy-content').innerHTML=html;
+}
+function bCartC(g,ti,d){
+  if(d>0)buyCart.items.push({good:g,ti:ti,price:G.bm[g][ti].p});
+  else{var idx=buyCart.items.map(function(i,j){return i.good===g&&i.ti===ti?j:-1;}).filter(function(j){return j>=0;}).pop();if(idx!==undefined)buyCart.items.splice(idx,1);}
+  renderBuyMod();
+}
+function confBuy(){
+  var p=G.players[buyCart.pid];
+  var tot=buyCart.items.reduce(function(s,i){return s+i.price;},0);
+  if(p.cash<tot){alert('資金が足りません！');return;}
+  buyCart.items.forEach(function(item){
+    G.bm[item.good][item.ti].taken++;p.cash-=item.price;p.cost+=item.price;
+    p.cargo.push({good:item.good,cost:item.price});
+  });
+  glog('🛒 '+p.name+'が'+buyCart.items.length+'個仕入れ（合計'+tot+'億円）');
+  closeOv('buy');finBuy(buyCart.pid);
+}
+function finBuy(pid){G.buyDone.push(pid);glog('✅ '+G.players[pid].name+'の仕入れ完了');renderAll();renderMarkets();renderBuyActs();}
+function aiBuy(p){
+  var max=p.cargoLv-p.cargo.length;var acts=[];var bought=0;
+  GOODS.forEach(function(g){
+    if(bought>=max)return;
+    G.bm[g].forEach(function(tier){
+      if(bought>=max)return;
+      if(tier.taken<tier.s&&p.cash>=tier.p){
+        p.cash-=tier.p;p.cost+=tier.p;tier.taken++;p.cargo.push({good:g,cost:tier.p});
+        acts.push({emoji:g[0],title:g+'を仕入れ！',detail:'仕入れ値: '+tier.p+'億円',result:'残り: '+p.cash+'億円 | 積荷: '+p.cargo.length+'/'+p.cargoLv+'枠',color:'#7FC8E8'});
+        glog('🤖 '+p.name+'が'+g+'を'+tier.p+'億で仕入れ');bought++;
+      }
+    });
+  });
+  if(!acts.length)acts.push({emoji:'💤',title:'仕入れなし',detail:'資金不足または積荷がいっぱい',result:'手持ち: '+p.cash+'億円',color:'rgba(245,237,216,0.5)'});
+  showAiAnn(p,acts,0,function(){finBuy(p.id);renderMarkets();});
+}
+
+// SELL PHASE
+function startSell(){
+  G.players.forEach(function(p){if(!p.hasShip||!p.cargo.length)G.sellDone.push(p.id);});
+  showVoyage('sell',function(){renderSellActs();});
+}
+function renderSellActs(){
+  var nd=G.players.filter(function(p){return G.sellDone.indexOf(p.id)===-1;}).sort(function(a,b){return G.arrOrder.indexOf(a.id)-G.arrOrder.indexOf(b.id);});
+  document.getElementById('apanel').style.display='block';
+  if(!nd.length){document.getElementById('atitle').textContent='💰 販売完了！';document.getElementById('abtns').innerHTML='<button class="btn bn" onclick="startPhase(3)">📊 決算フェーズへ →</button>';return;}
+  var p=nd[0];
+  document.getElementById('atitle').textContent='💰 販売フェーズ - '+p.name+'の番';
+  if(p.isAI){document.getElementById('abtns').innerHTML='<div style="color:var(--gold);font-size:13px">🤖 '+p.name+' が販売中...</div>';setTimeout(function(){aiSell(p);},1000);return;}
+  document.getElementById('abtns').innerHTML='<button class="btn bg" onclick="openSellMod('+p.id+')">💰 商品を売る</button><button class="btn bgn" onclick="finSell('+p.id+')">✅ 販売完了</button>';
+}
+
+var sellCart={};
+function openSellMod(pid){sellCart={pid:pid,items:[]};renderSellMod();openOv('sell');}
+function renderSellMod(){
+  var p=G.players[sellCart.pid];
+  var rev=sellCart.items.reduce(function(s,i){return s+i.price;},0);
+  var pc=p.cash+rev;
+  var cg=[...sellCart.items.map(function(i){return i.good;})];
+  var rem=p.cargo.filter(function(c){var ci=cg.indexOf(c.good);if(ci!==-1){cg.splice(ci,1);return false;}return true;});
+  var html='<div style="font-size:12px;padding:7px 11px;background:rgba(0,0,0,0.3);border-radius:7px;margin-bottom:9px">'
+    +'💴 手持ち: <strong style="color:var(--gold2)">'+p.cash+'億円</strong>'+(rev>0?' → <strong style="color:#7DCEA0">'+pc+'億円</strong>':'')
+    +' | 残り積荷: '+rem.length+'個</div>';
+  if(!p.cargo.length){html+='<div style="opacity:0.6;font-size:13px">売れる商品がありません</div>';}
+  else{
+    var grp={};
+    p.cargo.forEach(function(c){if(!grp[c.good])grp[c.good]=0;grp[c.good]++;});
+    Object.entries(grp).forEach(function(e){
+      var good=e[0];var count=e[1];
+      var cn=sellCart.items.filter(function(i){return i.good===good;}).length;
+      var rn=count-cn;
+      html+='<div style="margin-bottom:11px"><div style="font-size:12px;font-weight:700;margin-bottom:4px">'+good+' x'+count+'個'+(cn>0?' <span style="color:#7DCEA0;font-size:11px">(カート'+cn+'個)</span>':'')+'</div>';
+      G.sm[good].slice().reverse().forEach(function(tier){
+        var ti=G.sm[good].indexOf(tier);
+        var cti=sellCart.items.filter(function(i){return i.good===good&&i.ti===ti;}).length;
+        var av=tier.s-tier.taken-cti;var canA=av>0&&rn>0;
+        html+='<div class="or" style="margin-bottom:3px"><div class="oi">'+tier.p+'億円/個 <span style="font-size:10px;opacity:0.6">(残'+av+'枠)</span>'+(cti>0?'<span style="color:#7DCEA0;font-size:11px"> カート'+cti+'個</span>':'')+'</div>'
+          +'<div class="pmr"><button class="btn br" style="padding:4px 8px;font-size:12px" onclick="slCartC(\''+good+'\','+ti+',-1)" '+(cti===0?'disabled':'')+'>－</button>'
+          +'<span class="pmv">'+cti+'</span>'
+          +'<button class="btn bg" style="padding:4px 8px;font-size:12px" onclick="slCartC(\''+good+'\','+ti+',1)" '+(canA?'':'disabled')+'>＋</button></div></div>';
+      });
+      html+='</div>';
+    });
+  }
+  if(sellCart.items.length)html+='<div class="cbox">🛒 カート: '+sellCart.items.length+'個 合計 <strong style="color:#7DCEA0">+'+rev+'億円</strong></div>';
+  html+='<div class="mb"><button class="btn bgy" onclick="closeOv(\'sell\')">キャンセル</button><button class="btn bg" onclick="confSell()" '+(sellCart.items.length?'':'disabled')+'>✅ '+(sellCart.items.length?rev+'億円で販売確定':'商品を選んでください')+'</button></div>';
+  document.getElementById('sell-content').innerHTML=html;
+}
+function slCartC(g,ti,d){
+  if(d>0)sellCart.items.push({good:g,ti:ti,price:G.sm[g][ti].p});
+  else{var idx=sellCart.items.map(function(i,j){return i.good===g&&i.ti===ti?j:-1;}).filter(function(j){return j>=0;}).pop();if(idx!==undefined)sellCart.items.splice(idx,1);}
+  renderSellMod();
+}
+function confSell(){
+  var p=G.players[sellCart.pid];
+  sellCart.items.forEach(function(item){
+    var ci=p.cargo.findIndex(function(c){return c.good===item.good;});
+    if(ci===-1)return;
+    var citem=p.cargo.splice(ci,1)[0];
+    p.cash+=item.price;p.revenue+=item.price;
+    G.sm[item.good][item.ti].taken++;
+    glog('💰 '+p.name+'が'+item.good+'を'+item.price+'億で販売（仕入'+citem.cost+'億 → 差益'+(item.price-citem.cost)+'億）');
+  });
+  closeOv('sell');finSell(sellCart.pid);
+}
+function finSell(pid){
+  var p=G.players[pid];
+  if(p.cargo.length){glog('⚠️ '+p.name+'の未売却品'+p.cargo.length+'個は廃棄');p.cargo=[];}
+  G.sellDone.push(pid);renderAll();renderMarkets();renderSellActs();
+}
+function aiSell(p){
+  var acts=[];
+  while(p.cargo.length){
+    var good=p.cargo[0].good;
+    var tiers=G.sm[good].slice().sort(function(a,b){return b.p-a.p;});
+    var sold=false;
+    for(var i=0;i<tiers.length;i++){
+      if(tiers[i].taken<tiers[i].s){
+        var item=p.cargo.shift();p.cash+=tiers[i].p;p.revenue+=tiers[i].p;tiers[i].taken++;
+        var pr=tiers[i].p-item.cost;
+        acts.push({emoji:good[0],title:good+'を販売！',detail:'仕入'+item.cost+'億 → 売値'+tiers[i].p+'億（差益'+(pr>=0?'+':'')+pr+'億）',result:'手持ち: '+p.cash+'億円',color:pr>=0?'#7DCEA0':'#E98080'});
+        glog('🤖 '+p.name+'が'+good+'を'+tiers[i].p+'億で販売');sold=true;break;
+      }
+    }
+    if(!sold){var it=p.cargo.shift();acts.push({emoji:'!',title:good+'を廃棄',detail:'売る枠がなく廃棄（損失'+it.cost+'億）',result:'手持ち: '+p.cash+'億円',color:'#E98080'});}
+  }
+  if(!acts.length)acts.push({emoji:'💤',title:'販売なし',detail:'売れる商品がありませんでした',result:'手持ち: '+p.cash+'億円',color:'rgba(245,237,216,0.5)'});
+  showAiAnn(p,acts,0,function(){finSell(p.id);renderMarkets();});
+}
+
+// VOYAGE
+function showVoyage(dir,onDone){
+  var isBuy=dir==='buy';
+  var dest=isBuy?'南アジア':'ヨーロッパ';
+  var orig=isBuy?'ヨーロッパ':'南アジア';
+  var dEmoji=isBuy?'🐘':'🏰';
+  var ws=G.players.filter(function(p){return p.hasShip;});
+  var ns=G.players.filter(function(p){return!p.hasShip;});
+  var lvG={};
+  ws.forEach(function(p){if(!lvG[p.speedLv])lvG[p.speedLv]=[];lvG[p.speedLv].push(p.id);});
+  var dQ=Object.keys(lvG).filter(function(lv){return lvG[lv].length>1;}).sort(function(a,b){return b-a;}).map(function(lv){return{lv:parseInt(lv),ids:lvG[lv]};});
+  var dRes={};
+
+  // まず地図アニメーションを表示してからサイコロフェーズへ
+  function showMap(callback){
+    var ukX=108,ukY=58;
+    var capeX=158,capeY=278;
+    var indiaX=312,indiaY=195;
+
+    // 往路: UK→喜望峰→インド、復路: インド→喜望峰→UK
+    var routeD = isBuy
+      ? 'M'+ukX+','+ukY+' Q'+capeX+','+(capeY-80)+' '+capeX+','+capeY+' Q'+(capeX+90)+','+(capeY+10)+' '+indiaX+','+indiaY
+      : 'M'+indiaX+','+indiaY+' Q'+(capeX+90)+','+(capeY+10)+' '+capeX+','+capeY+' Q'+capeX+','+(capeY-80)+' '+ukX+','+ukY;
+
+    var mapHtml='<div style="text-align:center;margin-bottom:8px">'
+      +'<div style="font-family:Cinzel,serif;font-size:15px;color:var(--gold2);margin-bottom:3px">'+orig+' → '+dest+'</div>'
+      +'<div style="font-size:11px;opacity:0.7;margin-bottom:7px">'+(isBuy?'喜望峰を越えてインドへ出航！':'喜望峰を越えてイギリスへ帰路！')+'</div>'
+      +'<svg viewBox="0 0 460 320" style="width:100%;max-width:420px;border-radius:10px;background:linear-gradient(180deg,#071e3d 0%,#1B4F72 70%,#0d3a5c 100%)">'
+      +'<defs>'
+      +'<pattern id="wave2" x="0" y="0" width="40" height="20" patternUnits="userSpaceOnUse"><path d="M0,10 Q10,0 20,10 Q30,20 40,10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern>'
+      +'</defs>'
+      +'<rect width="460" height="320" fill="url(#wave2)"/>'
+      // ヨーロッパ大陸
+      +'<path d="M75,15 L150,15 L160,35 L155,55 L140,68 L125,75 L105,72 L88,58 L78,38 Z" fill="#4a7c4e" stroke="#2d5a30" stroke-width="1.5"/>'
+      // イギリス島
+      +'<ellipse cx="108" cy="52" rx="11" ry="16" fill="#5a9f5e" stroke="#2d5a30" stroke-width="1.2"/>'
+      // アフリカ大陸
+      +'<path d="M118,98 L178,93 L198,118 L203,178 L193,238 L172,288 L148,300 L126,280 L110,232 L105,180 L108,130 Z" fill="#c8a44a" stroke="#8a6a20" stroke-width="1.5"/>'
+      // アジア大陸
+      +'<path d="M238,38 L385,28 L425,58 L432,118 L412,148 L385,158 L355,153 L335,168 L315,205 L292,198 L270,168 L250,148 L232,118 L232,78 Z" fill="#6b8f4e" stroke="#3a5a25" stroke-width="1.5"/>'
+      // インド半島
+      +'<path d="M308,153 L328,168 L318,212 L304,232 L290,212 L294,173 Z" fill="#7a9f5e" stroke="#3a5a25" stroke-width="1.2"/>'
+      // 航路（方向付き点線）
+      +'<path id="rp" d="'+routeD+'" fill="none" stroke="rgba(255,215,0,0.6)" stroke-width="2.5" stroke-dasharray="8,5"/>'
+      // 出発マーカー（明るく）
+      +'<circle cx="'+(isBuy?ukX:indiaX)+'" cy="'+(isBuy?ukY:indiaY)+'" r="7" fill="'+(isBuy?'#F0C060':'#7DCEA0')+'" opacity="0.95"/>'
+      +'<text x="'+(isBuy?ukX:indiaX)+'" y="'+(isBuy?ukY:indiaY)+'" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#000" font-family="sans-serif">'+(isBuy?'GO':'GO')+'</text>'
+      // 到着マーカー（薄め）
+      +'<circle cx="'+(isBuy?indiaX:ukX)+'" cy="'+(isBuy?indiaY:ukY)+'" r="7" fill="rgba(255,255,255,0.3)" opacity="0.8"/>'
+      // 地名
+      +'<text x="108" y="35" text-anchor="middle" font-size="9" fill="#dff" font-family="sans-serif" font-weight="bold">イギリス</text>'
+      +'<text x="153" y="294" text-anchor="middle" font-size="9" fill="#dff" font-family="sans-serif" font-weight="bold">喜望峰</text>'
+      +'<text x="312" y="142" text-anchor="middle" font-size="9" fill="#dff" font-family="sans-serif" font-weight="bold">インド</text>'
+      // 船アニメーション
+      +'<g>'
+      +'<animateMotion dur="2.5s" fill="freeze" rotate="auto">'
+      +'<mpath href="#rp"/>'
+      +'</animateMotion>'
+      +'<text font-size="16" text-anchor="middle" dominant-baseline="middle">⛵</text>'
+      +'</g>'
+      +'</svg>'
+      +'</div>';
+
+    document.getElementById('voyage-content').innerHTML=mapHtml;
+    document.getElementById('voyage-btn').style.display='none';
+    setTimeout(function(){callback();},2900);
+  }
+
+  function render(gi,pi2){
+    var inD=gi<dQ.length;var cGrp=inD?dQ[gi]:null;var cPid=cGrp?cGrp.ids[pi2]:null;var cP=cPid!=null?G.players[cPid]:null;
+    var html='<div style="text-align:center;margin-bottom:9px">'
+      +'<div style="font-family:Cinzel,serif;font-size:16px;color:var(--gold2);margin-bottom:3px">'+orig+' → '+dest+'</div>'
+      +'<div style="font-size:12px;opacity:0.7;margin-bottom:10px">'+(isBuy?'南アジア市場へ出航！':'ヨーロッパ市場へ帰路！')+'</div>';
+    if(inD&&cP){
+      if(cP.isAI)html+='<div style="font-size:13px;color:var(--gold);padding:7px 11px;background:rgba(201,151,58,0.1);border-radius:8px;margin-bottom:9px">🤖 <strong style="color:'+cP.color+'">'+cP.name+'</strong> がサイコロを振っています...</div>';
+      else html+='<div style="font-size:13px;color:var(--gold2);padding:7px 11px;background:rgba(201,151,58,0.15);border:1px solid rgba(201,151,58,0.3);border-radius:8px;margin-bottom:9px">🎲 <strong style="color:'+cP.color+'">'+cP.name+'</strong> さん、サイコロを振ってください！<br><span style="font-size:11px;opacity:0.7">スピードLv'+cGrp.lv+'が同じ船の順番を決めます</span></div>';
+    }else if(!inD)html+='<div style="font-size:13px;color:#7DCEA0;padding:7px 11px;background:rgba(39,174,96,0.1);border-radius:8px;margin-bottom:9px">✅ 到着順が確定しました！</div>';
+    html+='</div>';
+    ws.forEach(function(p){
+      var inGrp=lvG[p.speedLv]&&lvG[p.speedLv].length>1;
+      var mr=dRes[p.id];var isCur=p.id===cPid;
+      var rank=!inD?G.arrOrder.indexOf(p.id):-1;
+      var rb=rank>=0?['🥇','🥈','🥉','4位'][rank]:(mr?mr:(inGrp?'🎲':'—'));
+      html+='<div class="vr'+((!inD&&rank===0)?' vw':'')+(isCur?' active':'')+'" style="'+(isCur?'border-color:'+p.color+';box-shadow:0 0 9px '+p.color+'44':'')+'">'
+        +'<div class="vrank">'+rb+'</div><div style="font-size:20px">⛵</div>'
+        +'<div class="vinfo"><div class="vname2" style="color:'+p.color+'">'+p.name+(p.isAI?' 🤖':'')+'</div><div class="vspd">🚀 スピードLv'+p.speedLv+'</div></div>'
+        +'<div class="vdice" id="vd-'+p.id+'">'+(!inD&&inGrp&&mr?mr:(inGrp&&!isCur&&!mr?'？':''))+'</div>'
+        +'</div>';
+    });
+    ns.forEach(function(p){html+='<div class="vr" style="opacity:0.35"><div class="vrank">—</div><div style="font-size:20px">🏠</div><div class="vinfo"><div class="vname2" style="color:'+p.color+'">'+p.name+'</div><div class="vspd">船なし・港で待機</div></div><div class="vdice"></div></div>';});
+    if(!inD){
+      html+='<div class="vres"><div style="color:var(--gold);margin-bottom:4px">'+dEmoji+' '+dest+'への到着順</div><div class="vord">'
+        +G.arrOrder.map(function(id,i){var p=G.players[id];return'<span style="color:'+p.color+';font-weight:700">'+['🥇','🥈','🥉','4位'][i]+' '+p.name+'</span>'+(i<G.arrOrder.length-1?'<span class="varr">→</span>':'');}).join('')
+        +'</div><div style="font-size:11px;opacity:0.5;margin-top:4px">先に到着した船ほど有利な価格帯を選べます</div></div>';
+    }
+    document.getElementById('voyage-content').innerHTML=html;
+    var vb=document.getElementById('voyage-btn');
+    if(!inD){vb.style.display='block';vb.textContent=dEmoji+' '+dest+'に上陸！';vb.disabled=false;vb.onclick=function(){closeOv('voyage');onDone();};}
+    else if(cP&&!cP.isAI){vb.style.display='block';vb.textContent='🎲 サイコロを振る！';vb.disabled=false;vb.onclick=function(){rollD(gi,pi2);};}
+    else{vb.style.display='none';if(cP)setTimeout(function(){rollD(gi,pi2);},1000);}
+  }
+
+  function rollD(gi,pi2){
+    var grp=dQ[gi];var pid=grp.ids[pi2];var pl=G.players[pid];
+    var vb=document.getElementById('voyage-btn');if(vb)vb.disabled=true;
+    var n=0;var el=document.getElementById('vd-'+pid);
+    var faces=['1','2','3','4','5','6'];
+    var tm=setInterval(function(){
+      if(el)el.textContent=faces[Math.floor(Math.random()*6)];
+      n++;
+      if(n>=12){
+        clearInterval(tm);
+        var val=Math.floor(Math.random()*6)+1;
+        dRes[pid]=val;
+        if(el)el.textContent=val;
+        glog('🎲 '+pl.name+'がサイコロを振って '+val+' が出た！');
+        if(vb)vb.disabled=false;
+        setTimeout(function(){
+          var np=pi2+1;
+          if(np<grp.ids.length){render(gi,np);}
+          else{var ng=gi+1;if(ng<dQ.length){render(ng,0);}else{finalize();}}
+        },700);
+      }
+    },100);
+  }
+
+  function finalize(){
+    var sorted=ws.slice().sort(function(a,b){
+      if(b.speedLv!==a.speedLv)return b.speedLv-a.speedLv;
+      var da=dRes[a.id]||0;var db=dRes[b.id]||0;
+      return db!==da?db-da:Math.random()-0.5;
+    });
+    G.arrOrder=sorted.map(function(p){return p.id;});
+    glog('📍 到着順確定: '+G.arrOrder.map(function(id){return G.players[id].name;}).join(' → '));
+    render(dQ.length,0);
+  }
+
+  openOv('voyage');
+  // まず地図アニメーションを表示してからサイコロへ
+  showMap(function(){
+    if(!dQ.length){
+      var s=ws.slice().sort(function(a,b){return b.speedLv-a.speedLv;});
+      G.arrOrder=s.map(function(p){return p.id;});
+      render(dQ.length,0);
+    } else {
+      render(0,0);
+    }
+  });
+}
+
+
+// ルール説明
+var RULES={
+  0:'<h3 style="color:var(--gold2);margin-bottom:10px">⚙️ 準備フェーズのルール</h3>'
+    +'<div style="font-size:13px;line-height:1.8">'
+    +'<b>📈 株を売る</b><br>自社株を投資家に売ってお金を集めます。1株=現在の株価。売れば売るほど資金が増えますが、配当を多く払うことになります。<br><br>'
+    +'<b>⛵ 船を買う</b><br>30億円で船を購入できます。船がないと仕入れ・販売ができません。手持ち20億なので最低3株売る必要があります。<br><br>'
+    +'<b>🔧 船を強化する（2ターン目以降）</b><br>'
+    +'スピードアップ: Lv1→2=3億, Lv2→3=5億, Lv3→4=10億（維持費なし）<br>'
+    +'積荷アップ:     Lv1→2=10億, Lv2→3=20億, Lv3→4=30億（維持費+1億/ターン）<br><br>'
+    +'<b>⚠️ 1ターンに強化できるのはスピードか積荷のどちらか1段階のみ</b><br><br>'
+    +'<b>🔧 船の維持費（毎ターン現金払い）</b><br>'
+    +'基本: 1億円/ターン<br>'
+    +'積荷Lv2: 2億円/ターン<br>'
+    +'積荷Lv3: 3億円/ターン<br>'
+    +'積荷Lv4: 4億円/ターン'
+    +'スピードが高いほど市場に早く着き、良い価格帯を選べます。積荷が多いほど一度に多く運べます。'
+    +'</div>',
+  1:'<h3 style="color:var(--gold2);margin-bottom:10px">🌊 仕入れフェーズのルール</h3>'
+    +'<div style="font-size:13px;line-height:1.8">'
+    +'スピードの速い船から順に南アジア市場で商品を選べます。<br><br>'
+    +'<b>買う市場のルール</b><br>'
+    +'安い枠から順番に選ばれていきます。早く着くほど安い枠を選べます。<br><br>'
+    +'<b>スパイス</b>: 1〜6億円<br>'
+    +'<b>お茶</b>: 2〜6億円<br>'
+    +'<b>シルク</b>: 3〜6億円<br><br>'
+    +'積荷レベルの枠数まで購入できます（Lv1=1個、Lv2=2個、Lv3=3個、Lv4=4個）。<br><br>'
+    +'<b>注意</b>: 一度埋まった枠はゲーム中ずっと使えません！'
+    +'</div>',
+  2:'<h3 style="color:var(--gold2);margin-bottom:10px">💰 販売フェーズのルール</h3>'
+    +'<div style="font-size:13px;line-height:1.8">'
+    +'仕入れと同じ到着順でヨーロッパ市場に到着し、商品を売ります。<br><br>'
+    +'<b>売る市場のルール</b><br>'
+    +'高い枠から順番に売れていきます。早く着くほど高く売れます。<br><br>'
+    +'<b>スパイス</b>: 7〜11億円<br>'
+    +'<b>お茶</b>: 8〜11億円<br>'
+    +'<b>シルク</b>: 9〜12億円<br><br>'
+    +'売れなかった商品は廃棄されます（損失になります）。'
+    +'</div>',
+  3:'<h3 style="color:var(--gold2);margin-bottom:10px">📊 決算フェーズのルール</h3>'
+    +'<div style="font-size:13px;line-height:1.8">'
+    +'<b>利益の計算</b><br>'
+    +'利益 = 売上 − 経費（仕入れ代＋船購入・強化費）<br><br>'
+    +'<b>株価変動</b><br>'
+    +'1位・2位: 株価 +1億円<br>'
+    +'3位: 変動なし<br>'
+    +'4位: 株価 -1億円<br><br>'
+    +'<b>美人投票とは？</b><br>'
+    +'株価は実際の利益だけでなく、「みんながどの会社を買いたいか」でも動きます。投資家が買うと株価が上がり、売ると下がります。<br><br>'
+    +'<b>船の減価償却</b><br>'
+    +'船の価値は毎ターン4億円ずつ下がります（30億→26億→22億…）。'
+    +'</div>',
+  4:'<h3 style="color:var(--gold2);margin-bottom:10px">💎 配当フェーズのルール</h3>'
+    +'<div style="font-size:13px;line-height:1.8">'
+    +'<b>配当とは？</b><br>'
+    +'投資家があなたの会社の株を持っていると、利益の一部を配当として受け取る権利があります。<br><br>'
+    +'<b>配当の計算</b><br>'
+    +'配当総額 = そのターンの利益 × 10%（小数点切り捨て）<br>'
+    +'各投資家への配当 = 配当総額 × （保有株数 ÷ 売出済み株数）<br><br>'
+    +'<b>配当が発生する条件</b><br>'
+    +'・3ターン目以降<br>'
+    +'・そのターンの利益が10億円以上<br><br>'
+    +'<b>勝利条件</b><br>'
+    +'7ターン終了時の総資産（現金＋船の価値＋保有株の時価）が最も多いプレイヤーが勝ち！'
+    +'</div>'
+};
+
+function showRules(){
+  var ph=G.phase||0;
+  document.getElementById('rules-content').innerHTML=RULES[ph]||RULES[0];
+  openOv('rules');
+}
+
+function startResults(){
+  // 維持費を現金から引く（船を持っている場合のみ）
+  G.players.forEach(function(p){
+    if(p.hasShip){
+      var maint=1+(p.cargoLv>1?p.cargoLv-1:0); // 基本1億 + 積荷(Lv-1)億
+      p.cash=Math.max(0,p.cash-maint);
+      p.cost+=maint;
+      glog('🔧 '+p.name+'の船維持費: '+maint+'億円（積荷Lv'+p.cargoLv+'）');
+    }
+  });
+
+  G.players.forEach(function(p){p.profit=p.revenue-p.cost;});
+  var ranked=G.players.slice().sort(function(a,b){return b.profit-a.profit;});
+  ranked.forEach(function(p,i){
+    var chg=i===0?1:i===1?1:(i===ranked.length-1&&ranked.length>=3?-1:0);
+    p.stockPrice=Math.max(1,p.stockPrice+chg);
+    glog('📊 '+p.name+': 利益'+p.profit+'億 ('+(i+1)+'位) → 株価'+p.stockPrice+'億');
+  });
+  G.players.forEach(function(p){if(p.hasShip){p.shipAge++;p.shipValue=Math.max(0,30-p.shipAge*4);}});
+  var isLast=G.turn>=G.maxTurns;
+  document.getElementById('rtitle').textContent='📊 第'+G.turn+'ターン 決算発表';
+  var html='<table class="rt"><tr><th>順位</th><th>会社</th><th>売上</th><th>経費+維持費</th><th>利益</th><th>株価</th></tr>';
+  ranked.forEach(function(p,i){
+    var maint=p.hasShip?1+(p.cargoLv>1?p.cargoLv-1:0):0;
+    html+='<tr class="'+(i===0?'r1':'')+'"><td>'+['🥇','🥈','🥉','4位'][i]+'</td><td style="color:'+p.color+'">'+p.name+'</td><td>'+p.revenue+'億</td><td>'+p.cost+'億<span style="font-size:10px;opacity:0.6">（維持費'+maint+'億含）</span></td><td style="color:'+(p.profit>=0?'#7DCEA0':'#E74C3C')+'">'+(p.profit>=0?'+':'')+p.profit+'億</td><td style="color:var(--gold2)">'+p.stockPrice+'億</td></tr>';
+  });
+  html+='</table>';
+  document.getElementById('rcontent').innerHTML=html;
+  var btn=document.getElementById('rbtn');
+  if(isLast){btn.textContent='🏆 最終結果へ';btn.onclick=showFinal;}
+  else{btn.textContent='💎 配当フェーズへ →';btn.onclick=function(){closeOv('results');startPhase(4);};}
+  openOv('results');renderAll();
+}
+
+// DIVIDEND
+function startDiv(){
+  // 配当計算（まず予告内容を作る）
+  var divActs=[];
+  var noDivReasons=[];
+
+  G.players.forEach(function(p){
+    if(G.turn<3){
+      noDivReasons.push(p.name+': まだ'+G.turn+'ターン目なので配当なし');
+      return;
+    }
+    if(p.profit<10){
+      noDivReasons.push(p.name+': 利益'+p.profit+'億円 → 10億未満のため配当なし');
+      return;
+    }
+    var div=Math.floor(p.profit*0.1);
+    var sold=10-p.stocks;
+    if(sold<=0||!div){
+      noDivReasons.push(p.name+': 投資家が株を持っていないため配当なし');
+      return;
+    }
+    var pays=[];
+    G.investors.forEach(function(inv){
+      var held=inv.holdings[p.id]||0;if(!held)return;
+      var pay=Math.floor((held/sold)*div);
+      if(pay>0) pays.push({inv:inv,held:held,pay:pay});
+    });
+    if(pays.length) divActs.push({p:p,div:div,pays:pays});
+    else noDivReasons.push(p.name+': 投資家が株を持っていないため配当なし');
+  });
+
+  // モーダルで説明してから実際に配当を払う
+  var html='<div style="font-size:13px;line-height:1.8">';
+
+  if(G.turn<3){
+    html+='<div style="padding:10px 14px;background:rgba(52,152,219,0.15);border:1px solid rgba(52,152,219,0.4);border-radius:8px;margin-bottom:12px">'
+      +'💡 配当は<strong>3ターン目以降</strong>かつ<strong>利益10億円以上</strong>の場合のみ発生します。<br>今は第'+G.turn+'ターンなのでまだ配当はありません。</div>';
+  } else if(!divActs.length){
+    html+='<div style="padding:10px 14px;background:rgba(52,152,219,0.15);border:1px solid rgba(52,152,219,0.4);border-radius:8px;margin-bottom:12px">'
+      +'今ターンは配当が発生する会社がありませんでした。</div>';
+  } else {
+    html+='<div style="padding:8px 12px;background:rgba(201,151,58,0.1);border-radius:8px;margin-bottom:12px;font-size:12px;opacity:0.8">'
+      +'💡 配当 = 利益 × 10% を保有株数に応じて投資家に分配します</div>';
+    divActs.forEach(function(act){
+      html+='<div style="margin-bottom:14px;padding:10px 14px;background:rgba(0,0,0,0.3);border-radius:8px;border-left:3px solid '+act.p.color+'">'
+        +'<div style="font-size:13px;font-weight:700;color:'+act.p.color+';margin-bottom:6px">'+act.p.name+'</div>'
+        +'<div style="font-size:12px;opacity:0.7;margin-bottom:6px">利益 '+act.p.profit+'億 × 10% = 配当総額 <strong style="color:var(--gold2)">'+act.div+'億円</strong></div>';
+      act.pays.forEach(function(pay){
+        html+='<div style="font-size:12px;padding:3px 0;display:flex;justify-content:space-between">'
+          +'<span>🏦 '+pay.inv.name+'（'+pay.held+'株保有）</span>'
+          +'<span style="color:#E98080;font-weight:700">-'+pay.pay+'億円</span>'
+          +'</div>';
+      });
+      var total=act.pays.reduce(function(s,v){return s+v.pay;},0);
+      html+='<div style="font-size:12px;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1);color:#E98080">合計支払: '+total+'億円</div>';
+      html+='</div>';
+    });
+  }
+
+  // 配当なしの理由
+  if(noDivReasons.length&&G.turn>=3){
+    html+='<div style="font-size:11px;opacity:0.5;margin-top:8px">'+noDivReasons.map(function(r){return'・'+r;}).join('<br>')+'</div>';
+  }
+  html+='</div>';
+
+  // まずモーダルで説明
+  document.getElementById('results-title')||0;
+  // 配当説明用モーダルを使う
+  var rTitle=document.getElementById('rtitle');
+  var rContent=document.getElementById('rcontent');
+  var rBtn=document.getElementById('rbtn');
+  rTitle.textContent='💎 配当フェーズ';
+  rContent.innerHTML=html;
+  rBtn.textContent='✅ 配当を支払う';
+  rBtn.onclick=function(){
+    closeOv('results');
+    // 実際に配当を払う
+    divActs.forEach(function(act){
+      act.pays.forEach(function(pay){
+        act.p.cash-=pay.pay;
+        pay.inv.cash+=pay.pay;
+        glog('💎 '+act.p.name+'→'+pay.inv.name+': 配当'+pay.pay+'億円（'+pay.held+'株保有）');
+      });
+    });
+    renderAll();
+    if(G.turn>=G.maxTurns){setTimeout(showFinal,500);return;}
+    document.getElementById('atitle').textContent='💎 配当フェーズ完了';
+    document.getElementById('abtns').innerHTML='<button class="btn bn" onclick="nxtTurn()">🌅 次のターンへ →</button>';
+  };
+  openOv('results');
+}
+
+function nxtTurn(){G.turn++;document.getElementById('mgrids').style.display='none';glog('🌅 ===== 第'+G.turn+'ターン開始 =====');startPhase(0);}
+
+// FINAL
+function showFinal(){
+  closeOv('results');
+  function tot(p){var ov=0;Object.entries(p.holdings).forEach(function(e){var op=G.players[e[0]];if(op)ov+=e[1]*op.stockPrice;});return p.cash+p.shipValue+(p.stocks*p.stockPrice)+ov;}
+  var ranked=G.players.slice().sort(function(a,b){return tot(b)-tot(a);});
+  document.getElementById('rtitle').textContent='🏆 最終結果';
+  var html='<div class="wb"><h2>👑 '+ranked[0].name+' の勝利！</h2><p>総資産: '+tot(ranked[0])+'億円</p></div>';
+  html+='<table class="rt"><tr><th>順位</th><th>会社</th><th>現金</th><th>船</th><th>自社株</th><th>他社株</th><th>総資産</th></tr>';
+  ranked.forEach(function(p,i){
+    var ov=0;Object.entries(p.holdings).forEach(function(e){var op=G.players[e[0]];if(op)ov+=e[1]*op.stockPrice;});
+    html+='<tr class="'+(i===0?'r1':'')+'"><td>'+['🥇','🥈','🥉','4位'][i]+'</td><td style="color:'+p.color+'">'+p.name+'</td><td>'+p.cash+'億</td><td>'+p.shipValue+'億</td><td>'+(p.stocks*p.stockPrice)+'億</td><td>'+ov+'億</td><td style="color:var(--gold2);font-weight:700">'+tot(p)+'億</td></tr>';
+  });
+  html+='</table><div style="text-align:center;margin-top:13px;font-size:12px;opacity:0.5">ゲームお疲れ様でした！</div>';
+  document.getElementById('rcontent').innerHTML=html;
+  var btn=document.getElementById('rbtn');
+  btn.textContent='🔄 もう一度遊ぶ';btn.onclick=function(){location.reload();};
+  openOv('results');
+}
+
+// 初期化不要（HTML直書き）
+</script>
+</body>
+</html>
